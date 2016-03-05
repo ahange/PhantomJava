@@ -1,0 +1,8 @@
+/bin
+/classes
+.classpath
+.project
+.settings
+*.pdf
+*.png
+/target
