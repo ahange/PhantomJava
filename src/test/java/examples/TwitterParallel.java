@@ -39,7 +39,7 @@ public class TwitterParallel {
 		}).thenComposeAsync((result) -> {
 			return result.page.text(".UserProfileHeader-statCount");
 		}).thenApplyAsync((result) -> {
-			System.out.println(user+" folgt "+result.text+" Personen");
+			System.out.println(">>>>>>>>> "+user+" folgt "+result.text+" Personen");
 			return finish.complete("READY");
 		});
 	}

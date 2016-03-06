@@ -1,25 +1,23 @@
 package examples;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.phantomjscef.data.Events;
 import org.phantomjscef.data.ImageType;
 import org.phantomjscef.data.KeyType;
 import org.phantomjscef.data.MouseEvent;
-import org.phantomjscef.data.Page;
 import org.phantomjscef.websocket.PhantomJs;
 
-public class Arc42 {
+public class Arc42Old {
 	
 	public static void main(String[] args) {
 		PhantomJs.startServer();
 		PhantomJs phantom = new PhantomJs();
+		
 		if (System.getProperty("phantomjsDir") != null){
 			String phantomjsDir = System.getProperty("phantomjsDir");
 			PhantomJs.startPhantomProcess(phantomjsDir);
 		}
 		
-		CompletableFuture<Page> ac = PhantomJs.waitForAckFuture().thenCompose((ev) -> {
+		PhantomJs.waitForAckFuture().thenCompose((ev) -> {
 			return phantom.loadUrl("http://confluence.arc42.org/display/templateEN/arc42+Template+%28English%29+-+Home");
 		}).thenCompose((result) -> {
 			result.page.setViewportSize(1920, 1200);
@@ -37,40 +35,19 @@ public class Arc42 {
 		}).thenCompose((result) -> {
 			phantom.writeToDisk(result.pic, "arc42.png");
 			return result.page.list("a[class*=search-result-link]");
-		}).thenApply((result) -> {
+		}).thenCompose((result) -> {
 			printArray(result.array);
-			return result.page;
+			return result.page.sendMouseEvent(MouseEvent.click, "a.pagination-next");
+		}).thenCompose((result) -> {
+			return result.page.awaitEvent(Events.onResourceReceived);
+		}).thenCompose((result) -> {
+			return result.page.list("a[class*=search-result-link]");
+		}).thenAccept((result) -> {
+			printArray(result.array);
+			PhantomJs.exit();
 		});
-		
-		iterateSearchResults(ac);
 	}
 	
-	private static void iterateSearchResults(CompletableFuture<Page> ac) {
-		CompletableFuture<Page> finish = new CompletableFuture<Page>();
-		ac.whenCompleteAsync((page,t)-> {
-			page.sendMouseEvent(MouseEvent.click, "a.pagination-next")
-			.thenCompose((result)-> {
-				return result.page.awaitEvent(Events.onResourceReceived);
-			})
-			.thenCompose((result) -> {
-				return result.page.list("a[class*=search-result-link]");
-			})
-			.thenCompose((result) -> {
-				printArray(result.array);
-				return result.page.list("a.pagination-next");
-			})
-			.thenAccept((result) -> {
-				if (result.array.length>0){
-					finish.complete(result.page);
-					iterateSearchResults(finish);
-				} else {
-					PhantomJs.exit();
-				}
-			});
-		});
-		
-	}
-
 	private static void printArray(String[] array){
 		for (String text : array){
 			System.out.println(text);

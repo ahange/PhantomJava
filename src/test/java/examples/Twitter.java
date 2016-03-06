@@ -20,7 +20,7 @@ public class Twitter {
 			result.page.setViewportSize(1280, 1024);
 			return result.page.text(".UserProfileHeader-statCount");
 		}).thenAccept((result) -> {
-			System.out.println("PhantomJS folgt "+result.text+" Personen");
+			System.out.println(">>>>>>> PhantomJS folgt "+result.text+" Personen");
 			PhantomJs.exit();
 		});
 
