@@ -42,7 +42,22 @@ public class Arc42 {
 			return result.page;
 		});
 		
-		iterateSearchResults(ac);
+		checkWeiterLink(ac);
+	}
+	
+	private static void checkWeiterLink(CompletableFuture<Page> ac) {
+		CompletableFuture<Page> finish = new CompletableFuture<Page>();
+		ac.whenCompleteAsync((page,t)-> {
+			page.list("a.pagination-next")
+			.thenAccept(result -> {
+				if (result.array.length==0){
+					PhantomJs.exit();
+				} else {
+					finish.complete(result.page);
+					iterateSearchResults(finish);
+				}
+			});
+		});
 	}
 	
 	private static void iterateSearchResults(CompletableFuture<Page> ac) {
@@ -55,17 +70,10 @@ public class Arc42 {
 			.thenCompose((result) -> {
 				return result.page.list("a[class*=search-result-link]");
 			})
-			.thenCompose((result) -> {
-				printArray(result.array);
-				return result.page.list("a.pagination-next");
-			})
 			.thenAccept((result) -> {
-				if (result.array.length>0){
-					finish.complete(result.page);
-					iterateSearchResults(finish);
-				} else {
-					PhantomJs.exit();
-				}
+				printArray(result.array);
+				finish.complete(result.page);
+				checkWeiterLink(finish);
 			});
 		});
 		

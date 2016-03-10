@@ -12,7 +12,7 @@ public class TwitterParallel {
 		PhantomJs.startServer();
 		if (System.getProperty("phantomjsDir") != null){
 			String phantomjsDir = System.getProperty("phantomjsDir");
-			PhantomJs.startPhantomProcess(phantomjsDir);
+			//PhantomJs.startPhantomProcess(phantomjsDir);
 		}
 		
 		String[] users = {"PhantomJS","ariyahidayat","Vitalliumm"};
@@ -28,17 +28,17 @@ public class TwitterParallel {
 		CompletableFuture<String>[] cfArray = cfList.stream().toArray(size -> new CompletableFuture[size]);
 		CompletableFuture.allOf(cfArray).handle((ok,ex) -> {
 			PhantomJs.exit();
-			return 0;
+			return null;
 		});
 	}
 	
 	private static void follow(String user, CompletableFuture<String> finish){
 		PhantomJs phantom = new PhantomJs();
-		PhantomJs.waitForAckFuture().thenComposeAsync((ev) -> {
+		PhantomJs.waitForAckFuture().thenCompose((ev) -> {
 			return phantom.loadUrl("http://mobile.twitter.com/"+user);
-		}).thenComposeAsync((result) -> {
+		}).thenCompose((result) -> {
 			return result.page.text(".UserProfileHeader-statCount");
-		}).thenApplyAsync((result) -> {
+		}).thenApply((result) -> {
 			System.out.println(">>>>>>>>> "+user+" folgt "+result.text+" Personen");
 			return finish.complete("READY");
 		});
