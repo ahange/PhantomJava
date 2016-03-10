@@ -3,7 +3,6 @@ package examples;
 import java.util.concurrent.CompletableFuture;
 
 import org.phantomjscef.data.Events;
-import org.phantomjscef.data.ImageType;
 import org.phantomjscef.data.KeyType;
 import org.phantomjscef.data.MouseEvent;
 import org.phantomjscef.data.Page;
@@ -31,11 +30,6 @@ public class Arc42 {
 		}).thenCompose((result) -> {
 			return result.page.awaitEvent(Events.onLoadFinished);
 		}).thenCompose((result) -> {
-			return result.page.pollPaint(2,500);
-		}).thenCompose((result) -> {
-			return result.page.renderImage(ImageType.PNG);
-		}).thenCompose((result) -> {
-			phantom.writeToDisk(result.pic, "arc42.png");
 			return result.page.list("a[class*=search-result-link]");
 		}).thenApply((result) -> {
 			printArray(result.array);
