@@ -16,11 +16,11 @@ public class Twitter {
 		
 		PhantomJs.waitForAckFuture().thenCompose((ev) -> {
 			return phantom.loadUrl("http://mobile.twitter.com/PhantomJS");
-		}).thenCompose((result) -> {
-			result.page.setViewportSize(1280, 1024);
-			return result.page.text(".UserProfileHeader-statCount");
-		}).thenAccept((result) -> {
-			System.out.println(">>>>>>> PhantomJS folgt "+result.text+" Personen");
+		}).thenCompose((page) -> {
+			page.setViewportSize(1280, 1024);
+			return page.text(".UserProfileHeader-statCount");
+		}).thenAccept((ptext) -> {
+			System.out.println(">>>>>>> PhantomJS folgt "+ptext.getText()+" Personen");
 			PhantomJs.exit();
 		});
 

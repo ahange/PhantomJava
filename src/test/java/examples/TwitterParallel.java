@@ -12,7 +12,7 @@ public class TwitterParallel {
 		PhantomJs.startServer();
 		if (System.getProperty("phantomjsDir") != null){
 			String phantomjsDir = System.getProperty("phantomjsDir");
-			//PhantomJs.startPhantomProcess(phantomjsDir);
+			PhantomJs.startPhantomProcess(phantomjsDir);
 		}
 		
 		String[] users = {"PhantomJS","ariyahidayat","Vitalliumm"};
@@ -36,10 +36,10 @@ public class TwitterParallel {
 		PhantomJs phantom = new PhantomJs();
 		PhantomJs.waitForAckFuture().thenCompose((ev) -> {
 			return phantom.loadUrl("http://mobile.twitter.com/"+user);
-		}).thenCompose((result) -> {
-			return result.page.text(".UserProfileHeader-statCount");
-		}).thenApply((result) -> {
-			System.out.println(">>>>>>>>> "+user+" folgt "+result.text+" Personen");
+		}).thenCompose((page) -> {
+			return page.text(".UserProfileHeader-statCount");
+		}).thenApply((pText) -> {
+			System.out.println(">>>>>>>>> "+user+" folgt "+pText.getText()+" Personen");
 			return finish.complete("READY");
 		});
 	}

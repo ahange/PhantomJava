@@ -48,7 +48,7 @@ ws.onmessage = function(e) {
 }
 
 ws.onclose = function() {
-  console.log('close')
+  //console.log('close');
   phantom.exit();
 }
 

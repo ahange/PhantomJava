@@ -60,36 +60,36 @@ public class Page {
 	}
 
 	
-	public  CompletableFuture<Result> awaitEvent(Events event){
+	public  CompletableFuture<Page> awaitEvent(Events event){
 		return FutureManager.addAndWaitForCompletableFuture(event,this);
 	}
 
-	public CompletableFuture<Result> waitForDomElement(String selector){
+	public CompletableFuture<Page> waitForDomElement(String selector){
 		Data data = new Data("waitForDomElement", this,encodeBase64(selector));
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
 		return  FutureManager.addAndWaitForCompletableFuture(Events.waitForDomElement,this);
 	}
 	
-	public CompletableFuture<Result> renderImage(ImageType pictureType){
+	public CompletableFuture<PageImage> renderImage(ImageType pictureType){
 		Data data = new Data("capture",this);
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
-		return  FutureManager.addAndWaitForCompletableFuture(Events.Image,this);
+		return FutureManager.addAndWaitForCompletableFuture(Events.Image,this);
 	}
-	public CompletableFuture<Result> sendMouseEvent(MouseEvent me, String selector){
+	public CompletableFuture<Page> sendMouseEvent(MouseEvent me, String selector){
 		Data data = new Data("sendMouseEvent",this,me.name(),encodeBase64(selector));
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
-		return  FutureManager.addAndWaitForCompletableFuture(Events.MouseEventFinished,this);
+		return FutureManager.addAndWaitForCompletableFuture(Events.MouseEventFinished,this);
 	}
-	public CompletableFuture<Result> sendKeyEvent(KeyType kt, String text){
+	public CompletableFuture<Page> sendKeyEvent(KeyType kt, String text){
 		Data data = new Data("sendKeyEvent",this,kt.name(),text);
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
 		return  FutureManager.addAndWaitForCompletableFuture(Events.KeyEventFinished,this);
 	}
-	public CompletableFuture<Result> pollPaint(int retries,long timeout) {
+	public CompletableFuture<Page> pollPaint(int retries,long timeout) {
 		Data data = new Data("pollPaint",this,String.valueOf(timeout),String.valueOf(retries));
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
@@ -100,32 +100,32 @@ public class Page {
 		r.event = Events.Timeout;
 		return FutureManager.addAndWaitForTimeFuture(timeout, r);
 	}
-	public CompletableFuture<Result> execute(String executable){
+	public CompletableFuture<Page> execute(String executable){
 		Data data = new Data("execute",this,encodeBase64(executable));
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
 		return FutureManager.addAndWaitForCompletableFuture(Events.execute,this);
 	}
-	public CompletableFuture<Result> test(String testFunction){
+	public CompletableFuture<Page> test(String testFunction){
 		Data data = new Data("test",this,encodeBase64(testFunction));
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
 		return FutureManager.addAndWaitForCompletableFuture(Events.test,this);
 	}
-	public CompletableFuture<Result> testScript(String jsFile){
+	public CompletableFuture<PageObject> testScript(String jsFile){
 		Data data = new Data("testScript",this,jsFile);
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
 		return FutureManager.addAndWaitForCompletableFuture(Events.testScript,this);
 	}
-	public CompletableFuture<Result> text(String selector) {
+	public CompletableFuture<PageText> text(String selector) {
 		Data data = new Data("text", this,encodeBase64(selector));
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);
 		return  FutureManager.addAndWaitForCompletableFuture(Events.text,this);
 	}
 
-	public CompletableFuture<Result> list(String selector) {
+	public CompletableFuture<PageList> list(String selector) {
 		Data data = new Data("list", this,encodeBase64(selector));
 		String json = JsonMapper.getJsonString(data);
 		WebsocketClientEndpoint.sendMessage(json);

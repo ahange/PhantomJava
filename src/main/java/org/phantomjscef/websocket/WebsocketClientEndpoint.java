@@ -36,12 +36,12 @@ public class WebsocketClientEndpoint {
 			while (iter.hasNext()){
 				iter.next().complete(Events.ACK);
 			}
-		}else if (!StringUtils.isEmpty(result.event.toString())){
+		} else if (!StringUtils.isEmpty(result.event.toString())) {
 			String key = result.event.toString()+"_"+result.page.uid;
-			CompletableFuture<Result> cf = FutureManager.getCompletableFuture(key);
+			CompletableFuture cf = FutureManager.getCompletableFuture(key);
 			if (cf!=null){
 				logger.info(key+" --> completed");
-				cf.complete(result);
+				cf.complete(result.getObject());
 			}
 		}
     }

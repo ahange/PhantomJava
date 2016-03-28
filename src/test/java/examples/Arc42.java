@@ -1,5 +1,6 @@
 package examples;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.phantomjscef.data.Events;
@@ -20,20 +21,20 @@ public class Arc42 {
 		
 		CompletableFuture<Page> ac = PhantomJs.waitForAckFuture().thenCompose((ev) -> {
 			return phantom.loadUrl("http://confluence.arc42.org/display/templateEN/arc42+Template+%28English%29+-+Home");
-		}).thenCompose((result) -> {
-			result.page.setViewportSize(1920, 1200);
-			return result.page.sendMouseEvent(MouseEvent.doubleclick, "input[name=queryString][class*=medium-field]");	
-		}).thenCompose((result) -> {
-			return result.page.sendKeyEvent(KeyType.keypress, "Requirements");	
-		}).thenCompose((result) -> {
-			return result.page.sendMouseEvent(MouseEvent.click, "input[type=submit][class=aui-button]");	
-		}).thenCompose((result) -> {
-			return result.page.awaitEvent(Events.onLoadFinished);
-		}).thenCompose((result) -> {
-			return result.page.list("a[class*=search-result-link]");
-		}).thenApply((result) -> {
-			printArray(result.array);
-			return result.page;
+		}).thenCompose((page) -> {
+			page.setViewportSize(1920, 1200);
+			return page.sendMouseEvent(MouseEvent.doubleclick, "input[name=queryString][class*=medium-field]");	
+		}).thenCompose((page) -> {
+			return page.sendKeyEvent(KeyType.keypress, "Requirements");	
+		}).thenCompose((page) -> {
+			return page.sendMouseEvent(MouseEvent.click, "input[type=submit][class=aui-button]");	
+		}).thenCompose((page) -> {
+			return page.awaitEvent(Events.onLoadFinished);
+		}).thenCompose((page) -> {
+			return page.list("a[class*=search-result-link]");
+		}).thenApply((plist) -> {
+			printArray(plist.getList());
+			return plist.getPage();
 		});
 		
 		checkWeiterLink(ac);
@@ -43,11 +44,11 @@ public class Arc42 {
 		CompletableFuture<Page> finish = new CompletableFuture<Page>();
 		ac.whenCompleteAsync((page,t)-> {
 			page.list("a.pagination-next")
-			.thenAccept(result -> {
-				if (result.array.length==0){
+			.thenAccept(plist -> {
+				if (plist.getList().size()==0){
 					PhantomJs.exit();
 				} else {
-					finish.complete(result.page);
+					finish.complete(plist.getPage());
 					iterateSearchResults(finish);
 				}
 			});
@@ -58,22 +59,22 @@ public class Arc42 {
 		CompletableFuture<Page> finish = new CompletableFuture<Page>();
 		ac.whenCompleteAsync((page,t)-> {
 			page.sendMouseEvent(MouseEvent.click, "a.pagination-next")
-			.thenCompose((result)-> {
-				return result.page.awaitEvent(Events.onResourceReceived);
+			.thenCompose((p)-> {
+				return p.awaitEvent(Events.onResourceReceived);
 			})
-			.thenCompose((result) -> {
-				return result.page.list("a[class*=search-result-link]");
+			.thenCompose((p) -> {
+				return p.list("a[class*=search-result-link]");
 			})
-			.thenAccept((result) -> {
-				printArray(result.array);
-				finish.complete(result.page);
+			.thenAccept((pList) -> {
+				printArray(pList.getList());
+				finish.complete(pList.getPage());
 				checkWeiterLink(finish);
 			});
 		});
 		
 	}
 
-	private static void printArray(String[] array){
+	private static void printArray(List<String> array){
 		for (String text : array){
 			System.out.println(text);
 		}

@@ -16,7 +16,6 @@ import org.glassfish.tyrus.server.Server;
 import org.phantomjscef.data.Data;
 import org.phantomjscef.data.Events;
 import org.phantomjscef.data.Page;
-import org.phantomjscef.data.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -51,7 +50,7 @@ public class PhantomJs {
 		startServer("localhost", 8887);
 	}
 	
-	public static CompletableFuture<?> waitForAckFuture(){
+	public static CompletableFuture<Events> waitForAckFuture(){
 		return FutureManager.waitForAckFuture();
 	}
 	
@@ -59,7 +58,7 @@ public class PhantomJs {
 		return Base64.encodeBase64String(s.getBytes(Charset.forName("ISO-8859-1")));
 	}
 
-	public CompletableFuture<Result> loadUrl(String url){
+	public CompletableFuture<Page> loadUrl(String url){
 		Page page = new Page();
 		Data data = new Data("start", page, url);	
 		String json = JsonMapper.getJsonString(data);
