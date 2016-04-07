@@ -33,9 +33,8 @@ public class TwitterParallel {
 	}
 	
 	private static void follow(String user, CompletableFuture<String> finish){
-		PhantomJs phantom = new PhantomJs();
 		PhantomJs.waitForAckFuture().thenCompose((ev) -> {
-			return phantom.loadUrl("http://mobile.twitter.com/"+user);
+			return PhantomJs.loadUrl("http://mobile.twitter.com/"+user);
 		}).thenCompose((page) -> {
 			return page.text(".UserProfileHeader-statCount");
 		}).thenApply((pText) -> {

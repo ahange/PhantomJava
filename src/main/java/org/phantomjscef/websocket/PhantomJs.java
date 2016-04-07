@@ -54,11 +54,7 @@ public class PhantomJs {
 		return FutureManager.waitForAckFuture();
 	}
 	
-	private String encodeBase64(String s){
-		return Base64.encodeBase64String(s.getBytes(Charset.forName("ISO-8859-1")));
-	}
-
-	public CompletableFuture<Page> loadUrl(String url){
+	public static CompletableFuture<Page> loadUrl(String url){
 		Page page = new Page();
 		Data data = new Data("start", page, url);	
 		String json = JsonMapper.getJsonString(data);
@@ -74,12 +70,12 @@ public class PhantomJs {
 
 	
 
-	public void writeToDisk(String pic, String filename) {
+	public static void writeToDisk(String pic, String filename) {
 		byte[] b = Base64.decodeBase64(pic);
 		writeByteArrayToFile(new File(filename), b);
 	}
 
-	private void writeByteArrayToFile(File f,byte[] b){
+	private static void writeByteArrayToFile(File f,byte[] b){
 		try {
 			FileUtils.writeByteArrayToFile(f, b);
 		} catch (Exception e){
